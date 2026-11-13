@@ -317,9 +317,10 @@ table{
     background: #f1f5f9;
 }
 
-#acordeon-p1 tr:hover td:first-child,
-#acordeon-p2 tr:hover td:first-child {
-    background: #e2e8f0;
+/* EFECTO HOVER UNIFICADO EN TODA LA FILA */
+#acordeon-p1 tr:hover td,
+#acordeon-p2 tr:hover td {
+    background: #e2e8f0 !important;
 }
 
 .tabla-gestion th.sortable {
@@ -1169,7 +1170,6 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
             let claseParcial = item.pctParcial < 40 ? "porcentaje-bajo" : "porcentaje-alto";
             let emoteParcial = item.pctParcial < 40 ? "🔴" : "🟢";
 
-            // Si el filtro está activo, añadimos la clase de borde destacado en la celda de porcentaje relevante (total o parcial según aplique)
             let claseDestacadaTotal = (filtroActivo && item.estaDesdeElInicio) ? " celda-porcentaje-filtrada" : "";
             let claseDestacadaParcial = (filtroActivo && !item.estaDesdeElInicio) ? " celda-porcentaje-filtrada" : "";
 
@@ -1546,7 +1546,7 @@ window.cargarDatos = async function(){
         });
 
         sociosMartesOficiales.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
-        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(a.nombre, 'es', { sensitivity: 'base' }));
 
         aplicarFiltro();
         pintarTablasPeriodos();
