@@ -770,9 +770,9 @@ details.container[open] summary {
                     <div>
                         <label for="nuevoNombre">
                             Nombre del Socio:
-                            <span class="label-ayuda">Se habilita automáticamente al elegir nuevo socio</span>
+                            <span class="label-ayuda">Elige un socio para editar o cambiar de grupo</span>
                         </label>
-                        <input type="text" id="nuevoNombre" placeholder="Ej: Juan Pérez" disabled required>
+                        <input type="text" id="nuevoNombre" placeholder="Ej: Juan Pérez" required>
                     </div>
                 </div>
 
@@ -1350,7 +1350,7 @@ window.seleccionarSocioParaEditar = function() {
 
     if (!nombreSeleccionado) {
         inputNombre.value = "";
-        inputNombre.disabled = false;
+        inputNombre.disabled = false; // Habilitado por defecto para nuevo socio
         selectGrupo.value = "martes";
         inputAlta.value = obtenerFechaActualFormateada();
         inputBaja.value = "";
@@ -1360,7 +1360,7 @@ window.seleccionarSocioParaEditar = function() {
     const socio = mapaGlobalSocios.get(nombreSeleccionado);
     if (socio) {
         inputNombre.value = socio.nombre;
-        inputNombre.disabled = true;
+        inputNombre.disabled = true; // Deshabilitado al editar un socio existente
         selectGrupo.value = socio.grupo;
         inputAlta.value = socio.alta || "";
         inputBaja.value = socio.baja || "";
@@ -1389,7 +1389,7 @@ window.guardarSocio = async function(event) {
         alert(`Socio "${nombre}" guardado/actualizado correctamente.`);
         
         document.getElementById("formSocio").reset();
-        inputNombre.disabled = true;
+        inputNombre.disabled = false;
         await cargarDatos();
     } catch (error) {
         console.error("Error al guardar socio:", error);
@@ -1520,17 +1520,16 @@ window.cargarDatos = async function(){
             document.getElementById("estado").textContent = "Inicializando listado de socios...";
             const promesasSeed = [];
 
-            // Calcular dinámicamente el primer día de juego real para cada grupo (Periodo 1)
             const fechasMartesP1 = generarFechasPeriodo("22/09/2026", "26/01/2027", 2, 1);
             const fechasJuevesP1 = generarFechasPeriodo("17/09/2026", "28/01/2027", 4, 1);
             const primeraMartes = fechasMartesP1.length > 0 ? fechasMartesP1[0] : "22/09/2026";
-            const primeiraJueves = fechasJuevesP1.length > 0 ? fechasJuevesP1[0] : "17/09/2026";
+            const primeraJueves = fechasJuevesP1.length > 0 ? fechasJuevesP1[0] : "17/09/2026";
 
             seedMartes.forEach(nombre => {
                 promesasSeed.push(setDoc(doc(db, "socios", nombre), { nombre, grupo: "martes", alta: primeraMartes, baja: "" }));
             });
             seedJueves.forEach(nombre => {
-                promesasSeed.push(setDoc(doc(db, "socios", nombre), { nombre, grupo: "jueves", alta: primeiraJueves, baja: "" }));
+                promesasSeed.push(setDoc(doc(db, "socios", nombre), { nombre, grupo: "jueves", alta: primeraJueves, baja: "" }));
             });
 
             await Promise.all(promesasSeed);
@@ -1552,7 +1551,7 @@ window.cargarDatos = async function(){
         });
 
         sociosMartesOficiales.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
-        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+        sociosJuevesOficiales.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
 
         aplicarFiltro();
         pintarTablasPeriodos();
