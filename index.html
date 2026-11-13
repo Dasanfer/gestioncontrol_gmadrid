@@ -754,7 +754,13 @@ details.container[open] summary {
 
         <!-- PANEL DE GESTIÓN DE SOCIOS -->
         <details class="container">
-            <summary>⚙️ Panel de Gestión de Socios (Altas, Bajas y Cambios)</summary>
+            <summary>⚙️ Panel de Gestión de Socios</summary>
+			
+			<h3>Fichaje manual de socio</h3>
+			
+			<hr style="margin: 25px 0; border: 0; border-top: 1px solid #eaeaea;">
+			
+			<h3>Altas, bajas y cambios de socios</h3>
             <form id="formSocio" onsubmit="guardarSocio(event)" style="margin-top: 15px;">
                 
                 <div class="filtros-grid">
@@ -806,26 +812,19 @@ details.container[open] summary {
                 <button type="submit" class="btn-accion">Guardar / Actualizar Socio en la Base de Datos</button>
             </form>
             
-            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eaeaea;">
-            
-            <div style="background: #fffbeb; border: 2px dashed #f59e0b; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 8px 0; color: #b45309; font-size: 15px;">📥 [BORRAR] Importador Temporal de Fichajes desde CSV</h3>
-                <p style="font-size: 12.5px; color: #92400e; margin-bottom: 12px; line-height: 1.4;">
-                    Sube tu archivo CSV con las columnas: <b>nombre, fecha (DD/MM/AAAA), grupo (martes/jueves)</b>.<br>
-                    <i>Una vez que termines de importar y verifiques tus datos, borra este bloque y su función JS asociada.</i>
-                </p>
-                <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 12px; font-size: 13px; background: white; padding: 8px; border: 1px solid #dcdcdc; border-radius: 6px; width: 100%;">
-                <button type="button" class="btn-accion" style="background-color: #d97706; padding: 10px 20px; font-size: 13px; margin-top: 0;" onclick="importarCSVAFirebase()">Subir Fichajes Masivamente a Firebase</button>
-            </div>
+			
+			<hr style="margin: 25px 0; border: 0; border-top: 1px solid #eaeaea;">
+			
+            <h3>Listado de socios en la Base de Datos</h3>
 
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
                 <h3 style="font-size: 15px; margin: 0; color: #1e293b;">Listado Actual de Socios en Base de Datos:</h3>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <label for="filtroGrupoGestion" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar:</label>
+                    <label for="filtroGrupoGestion" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por grupo:</label>
                     <select id="filtroGrupoGestion" onchange="pintarTablaGestionSocios()" style="padding: 6px 10px; font-size: 13px; max-width: 180px;">
                         <option value="todos">Todos</option>
-                        <option value="martes">Grupo Martes</option>
-                        <option value="jueves">Grupo Jueves</option>
+                        <option value="martes">Martes</option>
+                        <option value="jueves">Jueves</option>
                     </select>
                 </div>
             </div>
@@ -847,6 +846,20 @@ details.container[open] summary {
                     </tbody>
                 </table>
             </div>
+			
+			<hr style="margin: 25px 0; border: 0; border-top: 1px solid #eaeaea;">
+			
+            <h3>Importador de Fichajes desde CSV</h3>
+			
+            <div style="background: #fffbeb; border: 2px dashed #f59e0b; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
+                <p style="font-size: 12.5px; color: #92400e; margin-bottom: 12px; line-height: 1.4;">
+                    Sube tu archivo CSV con las columnas: <b>nombre, fecha (DD/MM/AAAA), grupo (martes/jueves)</b>.<br>
+                    <i>Una vez que termines de importar y verifiques tus datos, borra este bloque y su función JS asociada.</i>
+                </p>
+                <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 12px; font-size: 13px; background: white; padding: 8px; border: 1px solid #dcdcdc; border-radius: 6px; width: 100%;">
+                <button type="button" class="btn-accion" style="background-color: #d97706; padding: 10px 20px; font-size: 13px; margin-top: 0;" onclick="importarCSVAFirebase()">Subir Fichajes Masivamente a Firebase</button>
+            </div>
+			
         </details>
 
     </main>
@@ -1204,8 +1217,8 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
         let claseMediaPar = parseFloat(mediaParcial) < 40 ? "porcentaje-bajo" : "porcentaje-alto";
         let emoteMediaPar = parseFloat(mediaParcial) < 40 ? "🔴" : "🟢";
 
-        footRow += `<td class="celda-porcentaje ${claseMediaTot}" style="text-align: center;">${emoteMediaTot} ${mediaTotal}%</td>`;
-        footRow += `<td class="celda-porcentaje ${claseMediaPar}" style="text-align: center;">${emoteMediaPar} ${mediaParcial}%</td>`;
+        footRow += `<td class="" style="text-align: center;">${mediaTotal}%</td>`;
+        footRow += `<td class="" style="text-align: center;">${mediaParcial}%</td>`;
         footRow += `</tr>`;
         tfoot.innerHTML = footRow;
     }
@@ -1289,7 +1302,7 @@ window.pintarTablaGestionSocios = function() {
             ? `<span class="badge-estado-baja">Baja</span>` 
             : `<span class="badge-estado-alta">Alta</span>`;
 
-        let btnTextoBaja = esBaja ? 'Activar' : 'Dar de baja';
+        let btnTextoBaja = esBaja ? 'Volver a activar' : 'Dar de baja';
         let colorBaja = esBaja ? '#166534' : '#991b1b';
         let fondoBaja = esBaja ? '#dcfce7' : '#fee2e2';
         let bordeBaja = esBaja ? '#bbf7d0' : '#fecaca';
