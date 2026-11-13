@@ -423,6 +423,14 @@ tfoot td {
     background-color: #f1f5f9 !important;
     white-space: nowrap;
     border-left: 2px solid #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+/* BORDE DESTACADO CUANDO EL FILTRO ESTÁ ACTIVO */
+.celda-porcentaje-filtrada {
+    border: 2.5px solid #0078d4 !important;
+    box-shadow: inset 0 0 0 1px #0078d4;
+    background-color: #eff6ff !important;
 }
 
 .porcentaje-bajo {
@@ -1100,7 +1108,6 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
         const pctTotal = diasValidosTotal > 0 ? (asistenciasTotal / diasValidosTotal) * 100 : 0;
         const pctParcial = diasValidosParcial > 0 ? (asistenciasParcial / diasValidosParcial) * 100 : 0;
 
-        // Determinar inteligentemente si usa % Total o % Parcial para el filtro según su fecha de alta
         let estaDesdeElInicio = !fechaAlta || (primeraFechaPeriodo && fechaAlta <= primeraFechaPeriodo);
         let pctRelevanteFiltro = estaDesdeElInicio ? pctTotal : pctParcial;
 
@@ -1109,15 +1116,16 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
             celdasFechas: celdasFechasHtml,
             pctTotal: pctTotal,
             pctParcial: pctParcial,
-            pctRelevanteFiltro: pctRelevanteFiltro
+            pctRelevanteFiltro: pctRelevanteFiltro,
+            estaDesdeElInicio: estaDesdeElInicio
         });
     });
 
     const selectFiltro = document.getElementById(`filtroPctP${periodoNum}_${grupoNombre}`);
     const filtroPctVal = selectFiltro ? selectFiltro.value : 'todos';
+    const filtroActivo = filtroPctVal !== 'todos';
     
-    // FILTRADO INTELIGENTE (Total para antiguos / Parcial para incorporaciones tardías)
-    if (filtroPctVal !== 'todos') {
+    if (filtroActivo) {
         filasDatos = filasDatos.filter(item => {
             const esVerde = item.pctRelevanteFiltro >= 40;
             if (filtroPctVal === 'verde') {
@@ -1161,10 +1169,14 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
             let claseParcial = item.pctParcial < 40 ? "porcentaje-bajo" : "porcentaje-alto";
             let emoteParcial = item.pctParcial < 40 ? "🔴" : "🟢";
 
+            // Si el filtro está activo, añadimos la clase de borde destacado en la celda de porcentaje relevante (total o parcial según aplique)
+            let claseDestacadaTotal = (filtroActivo && item.estaDesdeElInicio) ? " celda-porcentaje-filtrada" : "";
+            let claseDestacadaParcial = (filtroActivo && !item.estaDesdeElInicio) ? " celda-porcentaje-filtrada" : "";
+
             let row = `<tr><td><b>${item.socio}</b></td>`;
             row += item.celdasFechas;
-            row += `<td class="celda-porcentaje ${claseTotal}">${emoteTotal} ${pctTotalStr}%</td>`;
-            row += `<td class="celda-porcentaje ${claseParcial}">${emoteParcial} ${pctParcialStr}%</td>`;
+            row += `<td class="celda-porcentaje ${claseTotal}${claseDestacadaTotal}">${emoteTotal} ${pctTotalStr}%</td>`;
+            row += `<td class="celda-porcentaje ${claseParcial}${claseDestacadaParcial}">${emoteParcial} ${pctParcialStr}%</td>`;
             row += `</tr>`;
             tbody.innerHTML += row;
         });
@@ -1534,7 +1546,7 @@ window.cargarDatos = async function(){
         });
 
         sociosMartesOficiales.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
-        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(a.nombre, 'es', { sensitivity: 'base' }));
+        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
 
         aplicarFiltro();
         pintarTablasPeriodos();
