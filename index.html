@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon"
+type="image/svg+xml"
+href='data:image/svg+xml,
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<rect y="0" width="64" height="10.6" fill="%23e40303"/>
+<rect y="10.6" width="64" height="10.6" fill="%23ff8c00"/>
+<rect y="21.2" width="64" height="10.6" fill="%23ffed00"/>
+<rect y="31.8" width="64" height="10.6" fill="%23008026"/>
+<rect y="42.4" width="64" height="10.6" fill="%230044d4"/>
+<rect y="53" width="64" height="11" fill="%23750087"/>
+<rect x="12" y="12" width="40" height="40" rx="8" fill="white" stroke="black" stroke-width="3"/>
+<circle cx="22" cy="22" r="3.5" fill="black"/>
+<circle cx="42" cy="22" r="3.5" fill="black"/>
+<circle cx="32" cy="32" r="3.5" fill="black"/>
+<circle cx="22" cy="42" r="3.5" fill="black"/>
+<circle cx="42" cy="42" r="3.5" fill="black"/>
+</svg>'>
+
+<title>Panel de Gestión y Control de Asistencias - GMadrid Juegos de Mesa</title>
+
+<!-- Importar SheetJS para exportar a Excel corporativo con formato nativo .xlsx -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 20px;
+    color: #333;
+}
+
+.wrapper-principal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+header, main, footer {
+    width: 100%;
+}
+
+.header-principal {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.header-principal h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.header-principal h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0078d4;
+    margin: 0;
+    display: inline-block;
+    background: rgba(0, 120, 212, 0.08);
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+.container{
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    border: 1px solid #eaeaea;
+}
+
+.container-table{
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+.container label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.container form label {
+    margin-top: 0;
+}
+
+.label-ayuda {
+    font-size: 12px;
+    font-weight: normal;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+input,
+select{
+    width: 100%;
+    padding: 13px;
+    box-sizing: border-box;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #fafbfc;
+    transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #0078d4;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+}
+
+input:disabled, select:disabled {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.filtros-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.filtros-historial-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 22px;
+    align-items: flex-end;
+}
+
+.filtro-item {
+    flex: 1;
+    min-width: 220px;
+}
+
+.barra-superior-pestana {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.filtros-periodo {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filtros-periodo select {
+    max-width: 250px;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+/* BOTÓN DE EXCEL CORPORATIVO COMPACTO (#107c41) */
+.btn-excel {
+    background-color: #107c41;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 12.5px;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 1px 3px rgba(16, 124, 65, 0.15);
+}
+
+.btn-excel:hover {
+    background-color: #0b5a30;
+}
+
+.btn-excel:active {
+    transform: scale(0.98);
+}
+
+.btn-accion {
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+.btn-accion:hover {
+    background-color: #005a9e;
+}
+
+@media (max-width: 850px) {
+    .filtros-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .filtros-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+/* Estilos generales para tablas que NO son de control de asistencia */
+.container:not(#acordeon-p1):not(#acordeon-p2) th, 
+.container:not(#acordeon-p1):not(#acordeon-p2) td {
+    border: 1px solid #d1d5db;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 13.5px;
+}
+
+.container:not(#acordeon-p1):not(#acordeon-p2) th {
+    background: #0078d4;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* ESTILOS EXCLUSIVOS PARA LAS TABLAS DE CONTROL DE ASISTENCIA (Periodos 1 y 2) */
+#acordeon-p1 th, #acordeon-p1 td,
+#acordeon-p2 th, #acordeon-p2 td {
+    border: 1px solid #d1d5db;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: center;
+    font-size: 12.5px;
+}
+
+#acordeon-p1 th, #acordeon-p2 th {
+    position: sticky;
+    top: 0;
+    background: #0078d4;
+    color: white;
+    z-index: 3;
+}
+
+#acordeon-p1 th:first-child, #acordeon-p1 td:first-child,
+#acordeon-p2 th:first-child, #acordeon-p2 td:first-child {
+    text-align: left !important;
+}
+
+#acordeon-p1 th:first-child, #acordeon-p2 th:first-child {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    background: #0078d4 !important;
+}
+
+#acordeon-p1 th.sortable, #acordeon-p2 th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+#acordeon-p1 th.sortable:hover, #acordeon-p2 th.sortable:hover {
+    background: #005a9e;
+}
+
+#acordeon-p1 td:first-child, #acordeon-p2 td:first-child {
+    position: sticky;
+    left: 0;
+    background: #ffffff;
+    z-index: 2;
+    border-right: 2.5px solid #94a3b8;
+    white-space: nowrap;
+}
+
+#acordeon-p1 tr:nth-child(even) td:first-child,
+#acordeon-p2 tr:nth-child(even) td:first-child {
+    background: #f1f5f9;
+}
+
+#acordeon-p1 tr:hover td:first-child,
+#acordeon-p2 tr:hover td:first-child {
+    background: #e2e8f0;
+}
+
+.tabla-gestion th.sortable {
+    cursor: pointer;
+    user-select: none;
+    background-color: #0078d4;
+    color: white;
+}
+
+.tabla-gestion th.sortable:hover {
+    background-color: #005a9e;
+}
+
+tr:nth-child(even){
+    background: #f8fafc;
+}
+
+/* BADGES DE ESTADO (GESTIÓN DE SOCIOS) */
+.badge-estado-alta {
+    display: inline-block;
+    padding: 2px 14px;
+    border-radius: 20px;
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    font-weight: 700;
+    font-size: 11.5px;
+    text-align: center;
+}
+
+.badge-estado-baja {
+    display: inline-block;
+    padding: 2px 14px;
+    border-radius: 20px;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+    font-size: 11.5px;
+    text-align: center;
+}
+
+/* BADGES DE ASISTENCIA (SÍ / NO) */
+.badge-asiste {
+    display: inline-block;
+    padding: 2px 14px;
+    border-radius: 20px;
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    font-weight: 700;
+    font-size: 11.5px;
+    text-align: center;
+}
+
+.badge-no-asiste {
+    display: inline-block;
+    padding: 2px 14px;
+    border-radius: 20px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    font-weight: 700;
+    font-size: 11.5px;
+    text-align: center;
+}
+
+.celda-estado {
+    text-align: center;
+}
+
+.celda-vacia {
+    text-align: center;
+    color: #94a3b8;
+}
+
+tfoot td {
+    background-color: #e2e8f0 !important;
+    font-weight: bold;
+    color: #1e293b;
+    border-top: 2.5px solid #94a3b8;
+    border-bottom: 2px solid #94a3b8;
+    text-align: center;
+    font-size: 11.5px;
+    white-space: nowrap;
+    padding: 6px 8px;
+}
+
+#acordeon-p1 tfoot td:first-child,
+#acordeon-p2 tfoot td:first-child {
+    text-align: left !important;
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    background-color: #e2e8f0 !important;
+}
+
+.celda-porcentaje {
+    text-align: center;
+    font-weight: 700;
+    background-color: #f1f5f9 !important;
+    white-space: nowrap;
+    border-left: 2px solid #cbd5e1;
+}
+
+.porcentaje-bajo {
+    color: #dc2626;
+}
+
+.porcentaje-alto {
+    color: #16a34a;
+}
+
+#estado{
+    margin: 20px 0 12px 0;
+    font-weight: 600;
+    font-size: 14px;
+    color: #64748b;
+    text-align: right;
+}
+
+details.container summary {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+details.container summary::-webkit-details-marker {
+    display: none;
+}
+
+details.container summary::before {
+    content: "▶";
+    font-size: 13px;
+    color: #0078d4;
+    transition: transform 0.2s ease;
+}
+
+details.container[open] summary::before {
+    content: "▼";
+}
+
+details.container[open] summary {
+    margin-bottom: 18px;
+}
+
+.tabs-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eaeaea;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #e2e8f0;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #475569;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: #0078d4;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.footer-informativo {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+    border: 1px solid #b3d7ff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0, 120, 212, 0.06);
+}
+
+.footer-informativo p {
+    margin: 0;
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 500;
+    line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper-principal">
+
+    <header>
+        <div class="header-principal">
+            <h1>PANEL DE GESTIÓN Y CONTROL DE ASISTENCIAS 📊</h1>
+            <h2>GMadrid Juegos de Mesa 🏳️‍🌈🎲</h2>
+        </div>
+    </header>
+
+    <main>
+        <!-- CONTENEDOR 1: PRIMER PERIODO -->
+        <details class="container" id="acordeon-p1" open>
+            <summary>📅 Control de Asistencia - Primer Periodo</summary>
+            
+            <div class="tabs-header">
+                <button type="button" class="tab-btn active" onclick="cambiarPestaña(1, 'martes')">📅 Grupo Martes (22/09/2026 - 26/01/2027)</button>
+                <button type="button" class="tab-btn" onclick="cambiarPestaña(1, 'jueves')">📅 Grupo Jueves (17/09/2026 - 28/01/2027)</button>
+            </div>
+
+            <!-- GRUPO MARTES - PERIODO 1 -->
+            <div id="p1-contenido-martes" class="tab-content active">
+                <div class="barra-superior-pestana">
+                    <div class="filtros-periodo">
+                        <label for="filtroPctP1_martes" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <select id="filtroPctP1_martes" onchange="actualizarFiltroPct(1)">
+                            <option value="todos">Todos</option>
+                            <option value="verde">🟢 Verde (≥ 40%)</option>
+                            <option value="rojo">🔴 Rojo (< 40%)</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-excel" onclick="exportarTablaAExcel(1, 'martes')">
+                        Descargar Excel
+                    </button>
+                </div>
+                <div class="container-table">
+                    <table id="tabla-p1-martes">
+                        <thead>
+                            <tr id="p1-headersMartes"></tr>
+                        </thead>
+                        <tbody id="p1-cuerpoMartes">
+                            <tr><td style="text-align: center; color: #888; padding: 20px;" colspan="2">Cargando...</td></tr>
+                        </tbody>
+                        <tfoot id="p1-footMartes"></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GRUPO JUEVES - PERIODO 1 -->
+            <div id="p1-contenido-jueves" class="tab-content">
+                <div class="barra-superior-pestana">
+                    <div class="filtros-periodo">
+                        <label for="filtroPctP1_jueves" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <select id="filtroPctP1_jueves" onchange="actualizarFiltroPct(1)">
+                            <option value="todos">Todos</option>
+                            <option value="verde">🟢 Verde (≥ 40%)</option>
+                            <option value="rojo">🔴 Rojo (< 40%)</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-excel" onclick="exportarTablaAExcel(1, 'jueves')">
+                        Descargar Excel
+                    </button>
+                </div>
+                <div class="container-table">
+                    <table id="tabla-p1-jueves">
+                        <thead>
+                            <tr id="p1-headersJueves"></tr>
+                        </thead>
+                        <tbody id="p1-cuerpoJueves">
+                            <tr><td style="text-align: center; color: #888; padding: 20px;" colspan="2">Cargando...</td></tr>
+                        </tbody>
+                        <tfoot id="p1-footJueves"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </details>
+
+        <!-- CONTENEDOR 2: SEGUNDO PERIODO -->
+        <details class="container" id="acordeon-p2">
+            <summary>📅 Control de Asistencia - Segundo Periodo</summary>
+            
+            <div class="tabs-header">
+                <button type="button" class="tab-btn active" onclick="cambiarPestaña(2, 'martes')">📅 Grupo Martes (02/02/2027 - 22/06/2027)</button>
+                <button type="button" class="tab-btn" onclick="cambiarPestaña(2, 'jueves')">📅 Grupo Jueves (04/02/2027 - 24/06/2027)</button>
+            </div>
+
+            <!-- GRUPO MARTES - PERIODO 2 -->
+            <div id="p2-contenido-martes" class="tab-content active">
+                <div class="barra-superior-pestana">
+                    <div class="filtros-periodo">
+                        <label for="filtroPctP2_martes" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <select id="filtroPctP2_martes" onchange="actualizarFiltroPct(2)">
+                            <option value="todos">Todos</option>
+                            <option value="verde">🟢 Verde (≥ 40%)</option>
+                            <option value="rojo">🔴 Rojo (< 40%)</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-excel" onclick="exportarTablaAExcel(2, 'martes')">
+                        Descargar Excel
+                    </button>
+                </div>
+                <div class="container-table">
+                    <table id="tabla-p2-martes">
+                        <thead>
+                            <tr id="p2-headersMartes"></tr>
+                        </thead>
+                        <tbody id="p2-cuerpoMartes">
+                            <tr><td style="text-align: center; color: #888; padding: 20px;" colspan="2">Cargando...</td></tr>
+                        </tbody>
+                        <tfoot id="p2-footMartes"></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GRUPO JUEVES - PERIODO 2 -->
+            <div id="p2-contenido-jueves" class="tab-content">
+                <div class="barra-superior-pestana">
+                    <div class="filtros-periodo">
+                        <label for="filtroPctP2_jueves" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <select id="filtroPctP2_jueves" onchange="actualizarFiltroPct(2)">
+                            <option value="todos">Todos</option>
+                            <option value="verde">🟢 Verde (≥ 40%)</option>
+                            <option value="rojo">🔴 Rojo (< 40%)</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-excel" onclick="exportarTablaAExcel(2, 'jueves')">
+                        Descargar Excel
+                    </button>
+                </div>
+                <div class="container-table">
+                    <table id="tabla-p2-jueves">
+                        <thead>
+                            <tr id="p2-headersJueves"></tr>
+                        </thead>
+                        <tbody id="p2-cuerpoJueves">
+                            <tr><td style="text-align: center; color: #888; padding: 20px;" colspan="2">Cargando...</td></tr>
+                        </tbody>
+                        <tfoot id="p2-footJueves"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </details>
+
+        <!-- CONTENEDOR 3: HISTORIAL GENERAL DE FICHAJES -->
+        <details class="container">
+            <summary>📋 Historial General de Fichajes</summary>
+            
+            <div class="filtros-historial-flex" style="margin-top: 15px;">
+                <div class="filtro-item">
+                    <label for="buscadorNombre">
+                        <b>Buscar por Nombre:</b>
+                        <span class="label-ayuda">Filtrar por usuario</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="buscadorNombre"
+                        placeholder="Escribe el nombre..."
+                        oninput="aplicarFiltro()">
+                </div>
+
+                <div class="filtro-item">
+                    <label for="filtroDia">
+                        <b>Grupo:</b>
+                        <span class="label-ayuda">Día de juego</span>
+                    </label>
+                    <select id="filtroDia" onchange="aplicarFiltro()">
+                        <option value="">Todos</option>
+                        <option value="martes">Martes</option>
+                        <option value="jueves">Jueves</option>
+                    </select>
+                </div>
+
+                <div class="filtro-item">
+                    <label for="filtroFecha">
+                        <b>Fecha:</b>
+                        <span class="label-ayuda">DD/MM/AAAA</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="filtroFecha"
+                        placeholder="DD/MM/AAAA"
+                        oninput="aplicarFiltro()">
+                </div>
+            </div>
+            
+            <div id="estado">
+                Cargando datos...
+            </div>
+            
+            <div class="container-table" style="max-height: 350px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Grupo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaDatos"></tbody>
+                </table>
+            </div>
+        </details>
+
+        <!-- PANEL DE GESTIÓN DE SOCIOS -->
+        <details class="container">
+            <summary>⚙️ Panel de Gestión de Socios (Altas, Bajas y Cambios)</summary>
+            <form id="formSocio" onsubmit="guardarSocio(event)" style="margin-top: 15px;">
+                
+                <div class="filtros-grid">
+                    <div>
+                        <label for="selectSocioGestion">
+                            Seleccionar Socio Existente:
+                            <span class="label-ayuda">Elige un socio para editar o cambiar de grupo</span>
+                        </label>
+                        <select id="selectSocioGestion" onchange="seleccionarSocioParaEditar()">
+                            <option value="">-- Nuevo socio / Escribir manualmente --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="nuevoNombre">
+                            Nombre del Socio:
+                            <span class="label-ayuda">Se habilita automáticamente al elegir nuevo socio</span>
+                        </label>
+                        <input type="text" id="nuevoNombre" placeholder="Ej: Juan Pérez" disabled required>
+                    </div>
+                </div>
+
+                <div class="filtros-grid-3">
+                    <div>
+                        <label for="nuevoGrupo">
+                            Grupo Asignado:
+                            <span class="label-ayuda">Cambio de grupo automático</span>
+                        </label>
+                        <select id="nuevoGrupo" required>
+                            <option value="martes">Martes</option>
+                            <option value="jueves">Jueves</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="nuevaAlta">
+                            Fecha de Alta:
+                            <span class="label-ayuda">Se autocompleta con hoy</span>
+                        </label>
+                        <input type="text" id="nuevaAlta" placeholder="DD/MM/AAAA">
+                    </div>
+                    <div>
+                        <label for="nuevaBaja">
+                            Fecha de Baja:
+                            <span class="label-ayuda">Dejar vacío si está activo</span>
+                        </label>
+                        <input type="text" id="nuevaBaja" placeholder="DD/MM/AAAA">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-accion">Guardar / Actualizar Socio en la Base de Datos</button>
+            </form>
+            
+            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eaeaea;">
+            
+            <div style="background: #fffbeb; border: 2px dashed #f59e0b; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
+                <h3 style="margin: 0 0 8px 0; color: #b45309; font-size: 15px;">📥 [BORRAR] Importador Temporal de Fichajes desde CSV</h3>
+                <p style="font-size: 12.5px; color: #92400e; margin-bottom: 12px; line-height: 1.4;">
+                    Sube tu archivo CSV con las columnas: <b>nombre, fecha (DD/MM/AAAA), grupo (martes/jueves)</b>.<br>
+                    <i>Una vez que termines de importar y verifiques tus datos, borra este bloque y su función JS asociada.</i>
+                </p>
+                <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 12px; font-size: 13px; background: white; padding: 8px; border: 1px solid #dcdcdc; border-radius: 6px; width: 100%;">
+                <button type="button" class="btn-accion" style="background-color: #d97706; padding: 10px 20px; font-size: 13px; margin-top: 0;" onclick="importarCSVAFirebase()">Subir Fichajes Masivamente a Firebase</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                <h3 style="font-size: 15px; margin: 0; color: #1e293b;">Listado Actual de Socios en Base de Datos:</h3>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label for="filtroGrupoGestion" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar:</label>
+                    <select id="filtroGrupoGestion" onchange="pintarTablaGestionSocios()" style="padding: 6px 10px; font-size: 13px; max-width: 180px;">
+                        <option value="todos">Todos</option>
+                        <option value="martes">Grupo Martes</option>
+                        <option value="jueves">Grupo Jueves</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="container-table" style="max-height: 300px; overflow-y: auto;">
+                <table class="tabla-gestion">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="ordenarTablaGestion('nombre')">Nombre <span id="flecha-gestion-nombre">▲</span></th>
+                            <th class="sortable" onclick="ordenarTablaGestion('grupo')">Grupo <span id="flecha-gestion-grupo"></span></th>
+                            <th class="sortable" onclick="ordenarTablaGestion('estado')">Estado <span id="flecha-gestion-estado"></span></th>
+                            <th class="sortable" onclick="ordenarTablaGestion('alta')">Fecha de Alta <span id="flecha-gestion-alta"></span></th>
+                            <th class="sortable" onclick="ordenarTablaGestion('baja')">Fecha de Baja <span id="flecha-gestion-baja"></span></th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaGestionSocios">
+                        <tr><td colspan="6" style="text-align: center; color: #888;">Cargando socios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </details>
+
+    </main>
+
+    <footer>
+        <div class="footer-informativo">
+            <p>💬 ¿Tienes algún problema, duda o sugerencia? Contacta con <b>Daniel Sánchez</b></p>
+        </div>
+    </footer>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA5vN0AbfISP-g-TrvX4Y34cZM8lejrYUM",
+    authDomain: "fichaje-gmadrid.firebaseapp.com",
+    projectId: "fichaje-gmadrid",
+    storageBucket: "fichaje-gmadrid.firebasestorage.app",
+    messagingSenderId: "794464212993",
+    appId: "1:794464212993:web:7cd442168aa97f63d9c800"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let fichajes = [];
+let sociosMartesOficiales = [];
+let sociosJuevesOficiales = [];
+let mapaGlobalSocios = new Map();
+
+let estadoOrdenGestion = { columna: 'nombre', direccion: 'asc' };
+
+const seedMartes = [
+    "Álvaro Ascariz", "Álvaro Barreiro", "Álvaro de la Parte", "Álvaro de Mera", 
+    "Álvaro F. Chércoles", "Álvaro Fernández", "Álvaro Moreno", "André", "Ansel", 
+    "Blanca", "Carlos (Martes)", "Craig", "David Horcajada", "Edu", "Fer", 
+    "Fran", "Francesco", "Iyan", "Juan", "Kike", "Manu (México)", 
+    "Manu (Telecinco)", "Miguel", "Noli", "Rubén", "Víctor (Martes)", "Xavi", "Yeray"
+];
+
+const seedJueves = [
+    "Adrián", "Alberto Carranza", "Alberto Tresoldi", "Ángel", "Beñat", 
+    "Carlos (Jueves)", "Daniel Alfayate", "Daniel Gimeno", "Daniel Sánchez", 
+    "David Rodríguez (Dave)", "David Rodríguez (Ebri)", "Diego", "Ismael", 
+    "Iván", "Jaime", "José", "Koke", "Lionel", "Moha", "Rubén Alonso", "Toño", "Víctor (Jueves)"
+];
+
+let estadosOrden = {
+    p1Martes: { columna: 'socio', direccion: 'asc' },
+    p1Jueves: { columna: 'socio', direccion: 'asc' },
+    p2Martes: { columna: 'socio', direccion: 'asc' },
+    p2Jueves: { columna: 'socio', direccion: 'asc' }
+};
+
+function obtenerFechaActualFormateada() {
+    const hoy = new Date();
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const yyyy = hoy.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+}
+
+function limpiarNombreGrupo(nombre) {
+    if (!nombre) return "";
+    return nombre.trim();
+}
+
+function capitalizar(str) {
+    if (!str) return "";
+    let s = str.trim().toLowerCase();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+const festivosMadrid = [
+    "25/12/2026", "01/01/2027", "06/01/2027", "19/03/2027", 
+    "25/03/2027", "26/03/2027", "01/05/2027", "02/05/2027", "15/05/2027"  
+];
+
+function esFestivo(fechaStr) {
+    return festivosMadrid.includes(fechaStr);
+}
+
+function generarFechasPeriodo(fechaInicioStr, fechaFinStr, diaSemanaTarget, tipoPeriodo) {
+    let fechas = [];
+    let [dI, mI, aI] = fechaInicioStr.split('/').map(Number);
+    let [dF, mF, aF] = fechaFinStr.split('/').map(Number);
+    
+    let curr = new Date(aI, mI - 1, dI);
+    let fin = new Date(aF, mF - 1, dF);
+
+    let navidadInicio = new Date(2026, 11, 21);
+    let navidadFin = new Date(2027, 0, 10);
+
+    while (curr <= fin) {
+        let diaStr = curr.getDay(); 
+        if (diaStr === diaSemanaTarget) {
+            let dd = String(curr.getDate()).padStart(2, '0');
+            let mm = String(curr.getMonth() + 1).padStart(2, '0');
+            let yyyy = curr.getFullYear();
+            let fechaFormateada = `${dd}/${mm}/${yyyy}`;
+
+            let excluir = false;
+            if (tipoPeriodo === 1 && curr >= navidadInicio && curr <= navidadFin) excluir = true;
+            if (esFestivo(fechaFormateada)) excluir = true;
+
+            if (!excluir) fechas.push(fechaFormateada);
+        }
+        curr.setDate(curr.getDate() + 1);
+    }
+    return fechas;
+}
+
+function parsearFecha(fechaStr) {
+    const [d, m, y] = fechaStr.split('/').map(Number);
+    return new Date(y, m - 1, d);
+}
+
+window.cambiarPestaña = function(periodoNum, grupo) {
+    const prefijo = `p${periodoNum}`;
+    const contenedor = document.getElementById(`acordeon-p${periodoNum}`);
+    if(!contenedor) return;
+
+    contenedor.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    contenedor.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    if (grupo === 'martes') {
+        contenedor.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById(`${prefijo}-contenido-martes`).classList.add('active');
+    } else {
+        contenedor.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById(`${prefijo}-contenido-jueves`).classList.add('active');
+    }
+};
+
+window.ordenarTabla = function(periodoNum, grupo, columna) {
+    const key = `p${periodoNum}${grupo.charAt(0).toUpperCase() + grupo.slice(1)}`;
+    if (estadosOrden[key].columna === columna) {
+        estadosOrden[key].direccion = estadosOrden[key].direccion === 'asc' ? 'desc' : 'asc';
+    } else {
+        estadosOrden[key].columna = columna;
+        estadosOrden[key].direccion = 'asc';
+    }
+    pintarTablasPeriodos();
+};
+
+window.actualizarFiltroPct = function(periodoNum) {
+    pintarTablasPeriodos();
+};
+
+window.exportarTablaAExcel = function(periodoNum, grupo) {
+    const idTabla = `tabla-p${periodoNum}-${grupo}`;
+    const tabla = document.getElementById(idTabla);
+    if (!tabla) return;
+
+    const wb = XLSX.utils.table_to_book(tabla, { sheet: `Periodo ${periodoNum} - ${capitalizar(grupo)}` });
+    XLSX.writeFile(wb, `Control_Asistencia_P${periodoNum}_${capitalizar(grupo)}.xlsx`);
+};
+
+function pintarTabla(datos){
+    const tabla = document.getElementById("tablaDatos");
+    tabla.innerHTML = "";
+
+    if (datos.length === 0) {
+        tabla.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #888; padding: 20px;">No se encontraron registros.</td></tr>`;
+        return;
+    }
+
+    datos.forEach(dato => {
+        const nombreLimpio = limpiarNombreGrupo(dato.nombre);
+        const grupoBonito = capitalizar(dato.diaSemana || "");
+        tabla.innerHTML += `
+        <tr>
+            <td>${nombreLimpio}</td>
+            <td>${dato.fecha || ""}</td>
+            <td>${dato.hora || ""}</td>
+            <td>${grupoBonito}</td>
+        </tr>`;
+    });
+}
+
+function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNombre, idHeaders, idCuerpo, idFoot) {
+    const fechas = generarFechasPeriodo(inicioStr, finStr, diaTarget, periodoNum);
+    const totalFechas = fechas.length;
+    const key = `p${periodoNum}${grupoNombre.charAt(0).toUpperCase() + grupoNombre.slice(1)}`;
+    const ordenConfig = estadosOrden[key];
+
+    const trHead = document.getElementById(idHeaders);
+    
+    let flechaSocio = ordenConfig.columna === 'socio' ? (ordenConfig.direccion === 'asc' ? ' <span style="color:white;">▲</span>' : ' <span style="color:white;">▼</span>') : '';
+    let flechaTotal = ordenConfig.columna === 'pctTotal' ? (ordenConfig.direccion === 'asc' ? ' <span style="color:white;">▲</span>' : ' <span style="color:white;">▼</span>') : '';
+    let flechaParcial = ordenConfig.columna === 'pctParcial' ? (ordenConfig.direccion === 'asc' ? ' <span style="color:white;">▲</span>' : ' <span style="color:white;">▼</span>') : '';
+
+    let headersHtml = `<th class="sortable" onclick="ordenarTabla(${periodoNum}, '${grupoNombre}', 'socio')">Socios${flechaSocio}</th>`;
+    fechas.forEach(f => {
+        headersHtml += `<th>${f}</th>`;
+    });
+    headersHtml += `<th class="sortable" style="text-align: center;" onclick="ordenarTabla(${periodoNum}, '${grupoNombre}', 'pctTotal')">% Asistencia total${flechaTotal}</th>`;
+    headersHtml += `<th class="sortable" style="text-align: center;" onclick="ordenarTabla(${periodoNum}, '${grupoNombre}', 'pctParcial')">% Asistencia parcial${flechaParcial}</th>`;
+    trHead.innerHTML = headersHtml;
+
+    const sociosConfig = (grupoNombre === 'martes' ? sociosMartesOficiales : sociosJuevesOficiales).filter(s => !s.baja);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    let filasDatos = [];
+    let conteoAsistenciasPorFecha = new Array(totalFechas).fill(0);
+    let sociosActivosCount = 0;
+
+    sociosConfig.forEach(socioObj => {
+        const socio = socioObj.nombre;
+        const fechaAlta = socioObj.alta ? parsearFecha(socioObj.alta) : null;
+
+        let asistenciasTotal = 0;
+        let asistenciasParcial = 0;
+        let diasValidosTotal = 0;
+        let diasValidosParcial = 0;
+
+        let celdasFechasHtml = "";
+        
+        fechas.forEach((f, index) => {
+            let fechaObj = parsearFecha(f);
+
+            if (fechaAlta && fechaObj < fechaAlta) {
+                celdasFechasHtml += `<td class="celda-vacia">-</td>`;
+                return;
+            }
+
+            diasValidosTotal++;
+            if (fechaObj <= hoy) diasValidosParcial++;
+
+            let asistio = fichajes.some(item => limpiarNombreGrupo(item.nombre) === socio && item.fecha === f);
+
+            if (asistio) {
+                asistenciasTotal++;
+                conteoAsistenciasPorFecha[index]++;
+                if (fechaObj <= hoy) asistenciasParcial++;
+                celdasFechasHtml += `<td class="celda-estado"><span class="badge-asiste">Sí</span></td>`;
+            } else {
+                if (fechaObj <= hoy) {
+                    celdasFechasHtml += `<td class="celda-estado"><span class="badge-no-asiste">No</span></td>`;
+                } else {
+                    celdasFechasHtml += `<td class="celda-vacia">-</td>`;
+                }
+            }
+        });
+
+        sociosActivosCount++;
+
+        const pctTotal = diasValidosTotal > 0 ? (asistenciasTotal / diasValidosTotal) * 100 : 0;
+        const pctParcial = diasValidosParcial > 0 ? (asistenciasParcial / diasValidosParcial) * 100 : 0;
+
+        filasDatos.push({
+            socio: socio,
+            celdasFechas: celdasFechasHtml,
+            pctTotal: pctTotal,
+            pctParcial: pctParcial
+        });
+    });
+
+    const selectFiltro = document.getElementById(`filtroPctP${periodoNum}_${grupoNombre}`);
+    const filtroPctVal = selectFiltro ? selectFiltro.value : 'todos';
+    
+    if (filtroPctVal !== 'todos') {
+        filasDatos = filasDatos.filter(item => {
+            const esVerdeTotal = item.pctTotal >= 40;
+            const esVerdeParcial = item.pctParcial >= 40;
+            if (filtroPctVal === 'verde') {
+                return esVerdeTotal || esVerdeParcial;
+            } else {
+                return !esVerdeTotal || !esVerdeParcial;
+            }
+        });
+    }
+
+    filasDatos.sort((a, b) => {
+        let valA = a[ordenConfig.columna];
+        let valB = b[ordenConfig.columna];
+
+        if (typeof valA === 'string') {
+            let comp = valA.localeCompare(valB, 'es', { sensitivity: 'base' });
+            return ordenConfig.direccion === 'asc' ? comp : -comp;
+        } else {
+            return ordenConfig.direccion === 'asc' ? valA - valB : valB - valA;
+        }
+    });
+
+    const tbody = document.getElementById(idCuerpo);
+    tbody.innerHTML = "";
+
+    let porcentajesTotalesSocios = [];
+    let porcentajesParcialesSocios = [];
+
+    if (filasDatos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${totalFechas + 3}" style="text-align: center; color: #888; padding: 20px;">No hay socios activos que cumplan los filtros.</td></tr>`;
+    } else {
+        filasDatos.forEach(item => {
+            porcentajesTotalesSocios.push(item.pctTotal);
+            porcentajesParcialesSocios.push(item.pctParcial);
+
+            const pctTotalStr = item.pctTotal.toFixed(2);
+            let claseTotal = item.pctTotal < 40 ? "porcentaje-bajo" : "porcentaje-alto";
+            let emoteTotal = item.pctTotal < 40 ? "🔴" : "🟢";
+
+            const pctParcialStr = item.pctParcial.toFixed(2);
+            let claseParcial = item.pctParcial < 40 ? "porcentaje-bajo" : "porcentaje-alto";
+            let emoteParcial = item.pctParcial < 40 ? "🔴" : "🟢";
+
+            let row = `<tr><td><b>${item.socio}</b></td>`;
+            row += item.celdasFechas;
+            row += `<td class="celda-porcentaje ${claseTotal}">${emoteTotal} ${pctTotalStr}%</td>`;
+            row += `<td class="celda-porcentaje ${claseParcial}">${emoteParcial} ${pctParcialStr}%</td>`;
+            row += `</tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    const tfoot = document.getElementById(idFoot);
+    if (tfoot) {
+        let footRow = `<tr><td><b>Nº de asistencia (%)</b></td>`;
+        
+        fechas.forEach((f, index) => {
+            let sís = conteoAsistenciasPorFecha[index];
+            let porcentajeCol = sociosActivosCount > 0 ? ((sís / sociosActivosCount) * 100).toFixed(2) : "0.00";
+            footRow += `<td>${sís} de ${sociosActivosCount} (${porcentajeCol}%)</td>`;
+        });
+
+        let sumaTotales = porcentajesTotalesSocios.reduce((acc, val) => acc + val, 0);
+        let mediaTotal = porcentajesTotalesSocios.length > 0 ? (sumaTotales / porcentajesTotalesSocios.length).toFixed(2) : "0.00";
+        let claseMediaTot = parseFloat(mediaTotal) < 40 ? "porcentaje-bajo" : "porcentaje-alto";
+        let emoteMediaTot = parseFloat(mediaTotal) < 40 ? "🔴" : "🟢";
+
+        let sumaParciales = porcentajesParcialesSocios.reduce((acc, val) => acc + val, 0);
+        let mediaParcial = porcentajesParcialesSocios.length > 0 ? (sumaParciales / porcentajesParcialesSocios.length).toFixed(2) : "0.00";
+        let claseMediaPar = parseFloat(mediaParcial) < 40 ? "porcentaje-bajo" : "porcentaje-alto";
+        let emoteMediaPar = parseFloat(mediaParcial) < 40 ? "🔴" : "🟢";
+
+        footRow += `<td class="celda-porcentaje ${claseMediaTot}" style="text-align: center;">${emoteMediaTot} ${mediaTotal}%</td>`;
+        footRow += `<td class="celda-porcentaje ${claseMediaPar}" style="text-align: center;">${emoteMediaPar} ${mediaParcial}%</td>`;
+        footRow += `</tr>`;
+        tfoot.innerHTML = footRow;
+    }
+}
+
+function pintarTablasPeriodos() {
+    llenarMatrizPeriodo(1, "22/09/2026", "26/01/2027", 2, "martes", "p1-headersMartes", "p1-cuerpoMartes", "p1-footMartes");
+    llenarMatrizPeriodo(1, "17/09/2026", "28/01/2027", 4, "jueves", "p1-headersJueves", "p1-cuerpoJueves", "p1-footJueves");
+
+    llenarMatrizPeriodo(2, "02/02/2027", "22/06/2027", 2, "martes", "p2-headersMartes", "p2-cuerpoMartes", "p2-footMartes");
+    llenarMatrizPeriodo(2, "04/02/2027", "24/06/2027", 4, "jueves", "p2-headersJueves", "p2-cuerpoJueves", "p2-footJueves");
+}
+
+window.ordenarTablaGestion = function(columna) {
+    if (estadoOrdenGestion.columna === columna) {
+        estadoOrdenGestion.direccion = estadoOrdenGestion.direccion === 'asc' ? 'desc' : 'asc';
+    } else {
+        estadoOrdenGestion.columna = columna;
+        estadoOrdenGestion.direccion = 'asc';
+    }
+    pintarTablaGestionSocios();
+};
+
+window.pintarTablaGestionSocios = function() {
+    const tbody = document.getElementById("tablaGestionSocios");
+    const selectFiltro = document.getElementById("filtroGrupoGestion");
+    const filtroGrupo = selectFiltro ? selectFiltro.value : 'todos';
+    tbody.innerHTML = "";
+
+    ['nombre', 'grupo', 'estado', 'alta', 'baja'].forEach(c => {
+        const span = document.getElementById(`flecha-gestion-${c}`);
+        if (span) {
+            if (estadoOrdenGestion.columna === c) {
+                span.textContent = estadoOrdenGestion.direccion === 'asc' ? ' ▲' : ' ▼';
+            } else {
+                span.textContent = '';
+            }
+        }
+    });
+
+    let lista = Array.from(mapaGlobalSocios.values());
+
+    if (filtroGrupo !== 'todos') {
+        lista = lista.filter(s => s.grupo === filtroGrupo);
+    }
+
+    lista.sort((a, b) => {
+        let col = estadoOrdenGestion.columna;
+        let dir = estadoOrdenGestion.direccion === 'asc' ? 1 : -1;
+
+        if (col === 'grupo') {
+            let comp = a.grupo.localeCompare(b.grupo);
+            if (comp !== 0) return comp * dir;
+            return a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' });
+        } else if (col === 'estado') {
+            let estadoA = a.baja ? 'Baja' : 'Alta';
+            let estadoB = b.baja ? 'Baja' : 'Alta';
+            let comp = estadoA.localeCompare(estadoB);
+            if (comp !== 0) return comp * dir;
+            return a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' });
+        } else if (col === 'nombre') {
+            if (a.grupo !== b.grupo) {
+                return a.grupo === 'martes' ? -1 : 1;
+            }
+            return a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }) * dir;
+        } else {
+            let valA = a[col] || "";
+            let valB = b[col] || "";
+            return valA.localeCompare(valB, 'es', { sensitivity: 'base' }) * dir;
+        }
+    });
+
+    if (lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888;">No hay socios que coincidan con el filtro.</td></tr>`;
+        return;
+    }
+
+    lista.forEach(s => {
+        let esBaja = !!s.baja;
+        let badgeEstadoHtml = esBaja 
+            ? `<span class="badge-estado-baja">Baja</span>` 
+            : `<span class="badge-estado-alta">Alta</span>`;
+
+        let btnTextoBaja = esBaja ? 'Activar' : 'Dar de baja';
+        let colorBaja = esBaja ? '#166534' : '#991b1b';
+        let fondoBaja = esBaja ? '#dcfce7' : '#fee2e2';
+        let bordeBaja = esBaja ? '#bbf7d0' : '#fecaca';
+
+        let grupoBonito = capitalizar(s.grupo);
+
+        tbody.innerHTML += `
+        <tr>
+            <td><b>${s.nombre}</b></td>
+            <td><span style="font-weight: 600; color: #0078d4;">${grupoBonito}</span></td>
+            <td style="text-align: center;">${badgeEstadoHtml}</td>
+            <td>${s.alta || '-'}</td>
+            <td>${s.baja || '-'}</td>
+            <td style="text-align: center;">
+                <button type="button" style="background-color: ${fondoBaja}; color: ${colorBaja}; border: 1px solid ${bordeBaja}; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px;" onclick="darBajaLogicaSocio('${s.nombre}')">${btnTextoBaja}</button>
+            </td>
+        </tr>`;
+    });
+};
+
+window.actualizarSelectSociosGestion = function() {
+    const select = document.getElementById("selectSocioGestion");
+    select.innerHTML = `<option value="">-- Nuevo socio / Escribir manualmente --</option>`;
+
+    let todosLosSocios = Array.from(mapaGlobalSocios.values()).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+    
+    let sociosMartes = todosLosSocios.filter(s => s.grupo === 'martes');
+    let sociosJueves = todosLosSocios.filter(s => s.grupo === 'jueves');
+
+    let optMartes = document.createElement('optgroup');
+    optMartes.label = "Martes";
+    sociosMartes.forEach(s => {
+        let opt = document.createElement('option');
+        opt.value = s.nombre;
+        let nombreSinGrupo = s.nombre.replace(/\s*\((Martes|Jueves)\)/gi, "").trim();
+        opt.textContent = `${nombreSinGrupo}${s.baja ? ' [BAJA]' : ''}`;
+        optMartes.appendChild(opt);
+    });
+
+    let optJueves = document.createElement('optgroup');
+    optJueves.label = "Jueves";
+    sociosJueves.forEach(s => {
+        let opt = document.createElement('option');
+        opt.value = s.nombre;
+        let nombreSinGrupo = s.nombre.replace(/\s*\((Martes|Jueves)\)/gi, "").trim();
+        opt.textContent = `${nombreSinGrupo}${s.baja ? ' [BAJA]' : ''}`;
+        optJueves.appendChild(opt);
+    });
+
+    select.appendChild(optMartes);
+    select.appendChild(optJueves);
+};
+
+window.seleccionarSocioParaEditar = function() {
+    const nombreSeleccionado = document.getElementById("selectSocioGestion").value;
+    const inputNombre = document.getElementById("nuevoNombre");
+    const selectGrupo = document.getElementById("nuevoGrupo");
+    const inputAlta = document.getElementById("nuevaAlta");
+    const inputBaja = document.getElementById("nuevaBaja");
+
+    if (!nombreSeleccionado) {
+        inputNombre.value = "";
+        inputNombre.disabled = false;
+        selectGrupo.value = "martes";
+        inputAlta.value = obtenerFechaActualFormateada();
+        inputBaja.value = "";
+        return;
+    }
+
+    const socio = mapaGlobalSocios.get(nombreSeleccionado);
+    if (socio) {
+        inputNombre.value = socio.nombre;
+        inputNombre.disabled = true;
+        selectGrupo.value = socio.grupo;
+        inputAlta.value = socio.alta || "";
+        inputBaja.value = socio.baja || "";
+    }
+};
+
+window.guardarSocio = async function(event) {
+    event.preventDefault();
+    const inputNombre = document.getElementById("nuevoNombre");
+    const nombre = inputNombre.value.trim();
+    const grupo = document.getElementById("nuevoGrupo").value;
+    const alta = document.getElementById("nuevaAlta").value.trim();
+    const baja = document.getElementById("nuevaBaja").value.trim();
+
+    if(!nombre) return;
+
+    try {
+        const socioData = {
+            nombre: nombre,
+            grupo: grupo,
+            alta: alta || "",
+            baja: baja || ""
+        };
+
+        await setDoc(doc(db, "socios", nombre), socioData);
+        alert(`Socio "${nombre}" guardado/actualizado correctamente.`);
+        
+        document.getElementById("formSocio").reset();
+        inputNombre.disabled = true;
+        await cargarDatos();
+    } catch (error) {
+        console.error("Error al guardar socio:", error);
+        alert("Error al guardar el socio en la base de datos.");
+    }
+};
+
+window.darBajaLogicaSocio = async function(nombreSocio) {
+    const socio = mapaGlobalSocios.get(nombreSocio);
+    if (!socio) return;
+
+    const estaDadoDeBaja = !!socio.baja;
+    let mensajeConfirmacion = estaDadoDeBaja 
+        ? `¿Estás seguro de reactivar a ${nombreSocio}? Se eliminará su fecha de baja y volverá a contar en las tablas.` 
+        : `¿Estás seguro de dar de baja lógica a ${nombreSocio}? Se ocultará de las tablas de control de asistencia (manteniendo su historial y su registro en este panel).`;
+
+    if(confirm(mensajeConfirmacion)) {
+        try {
+            socio.baja = estaDadoDeBaja ? "" : obtenerFechaActualFormateada();
+            await setDoc(doc(db, "socios", nombreSocio), socio);
+            await cargarDatos();
+        } catch (error) {
+            console.error("Error al realizar la baja lógica:", error);
+            alert("No se pudo actualizar el estado del socio.");
+        }
+    }
+};
+
+window.importarCSVAFirebase = async function() {
+    const fileInput = document.getElementById("csvFileInput");
+    if (!fileInput.files.length) {
+        alert("Por favor, selecciona un archivo CSV primero.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async function(e) {
+        const text = e.target.result;
+        const lineas = text.split("\n");
+        let importadosCount = 0;
+
+        document.getElementById("estado").textContent = "Importando fichajes masivamente...";
+
+        for (let i = 1; i < lineas.length; i++) {
+            let linea = lineas[i].trim();
+            if (!linea) continue;
+
+            let separador = linea.includes(";") ? ";" : ",";
+            let columnas = linea.split(separador);
+
+            if (columnas.length >= 3) {
+                let nombre = columnas[0].trim();
+                let fecha = columnas[1].trim();
+                let grupo = columnas[2].trim().toLowerCase();
+
+                try {
+                    await setDoc(doc(collection(db, "fichajes")), {
+                        nombre: nombre,
+                        fecha: fecha,
+                        hora: "20:00",
+                        diaSemana: grupo
+                    });
+                    importadosCount++;
+                } catch (err) {
+                    console.error("Error al importar la línea:", linea, err);
+                }
+            }
+        }
+
+        alert(`¡Importación completada con éxito! Se han subido ${importadosCount} registros a Firebase.`);
+        await cargarDatos();
+    };
+
+    reader.readAsText(file);
+};
+
+window.aplicarFiltro = function(){
+    const filtroNombre = document.getElementById("buscadorNombre").value.toLowerCase().trim();
+    const filtroDia = document.getElementById("filtroDia").value.toLowerCase();
+    const filtroFecha = document.getElementById("filtroFecha").value.trim();
+
+    const filtrados = fichajes.filter(f => {
+        const nombreSocio = (f.nombre || "").toLowerCase();
+        const cumpleNombre = !filtroNombre || nombreSocio.includes(filtroNombre);
+        const cumpleDia = !filtroDia || (f.diaSemana || "").toLowerCase() === filtroDia;
+        const cumpleFecha = !filtroFecha || (f.fecha || "").includes(filtroFecha);
+        return cumpleNombre && cumpleDia && cumpleFecha;
+    });
+
+    // ORDEN LÓGICO: Más recientes primero (Fecha desc, luego Hora desc, luego Nombre asc)
+    filtrados.sort((a, b) => {
+        let fechaA = parsearFecha(a.fecha || "01/01/2000");
+        let fechaB = parsearFecha(b.fecha || "01/01/2000");
+
+        if (fechaA.getTime() !== fechaB.getTime()) {
+            return fechaB - fechaA; 
+        }
+
+        let horaA = a.hora || "00:00";
+        let horaB = b.hora || "00:00";
+        if (horaA !== horaB) {
+            return horaB.localeCompare(horaA); 
+        }
+
+        return (a.nombre || "").localeCompare(b.nombre || "", 'es', { sensitivity: 'base' });
+    });
+
+    pintarTabla(filtrados);
+    document.getElementById("estado").textContent = `${filtrados.length} de ${fichajes.length} registros`;
+};
+
+window.cargarDatos = async function(){
+    try{
+        document.getElementById("estado").textContent = "Cargando datos...";
+
+        const [snapshotFichajes, snapshotSocios] = await Promise.all([
+            getDocs(collection(db, "fichajes")),
+            getDocs(collection(db, "socios"))
+        ]);
+
+        fichajes = [];
+        snapshotFichajes.forEach(doc => {
+            fichajes.push({ id: doc.id, ...doc.data() });
+        });
+
+        if (snapshotSocios.empty) {
+            document.getElementById("estado").textContent = "Inicializando listado de socios...";
+            const promesasSeed = [];
+
+            seedMartes.forEach(nombre => {
+                promesasSeed.push(setDoc(doc(db, "socios", nombre), { nombre, grupo: "martes", alta: "", baja: "" }));
+            });
+            seedJueves.forEach(nombre => {
+                promesasSeed.push(setDoc(doc(db, "socios", nombre), { nombre, grupo: "jueves", alta: "", baja: "" }));
+            });
+
+            await Promise.all(promesasSeed);
+            return cargarDatos();
+        }
+
+        sociosMartesOficiales = [];
+        sociosJuevesOficiales = [];
+        mapaGlobalSocios.clear();
+
+        snapshotSocios.forEach(doc => {
+            const data = doc.data();
+            mapaGlobalSocios.set(data.nombre, data);
+            if (data.grupo === 'martes') {
+                sociosMartesOficiales.push(data);
+            } else if (data.grupo === 'jueves') {
+                sociosJuevesOficiales.push(data);
+            }
+        });
+
+        sociosMartesOficiales.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+
+        aplicarFiltro();
+        pintarTablasPeriodos();
+        pintarTablaGestionSocios();
+        actualizarSelectSociosGestion();
+    }
+    catch(error){
+        console.error(error);
+        document.getElementById("estado").textContent = "Error cargando datos";
+    }
+};
+
+cargarDatos();
+
+document.addEventListener('DOMContentLoaded', () => {
+    const todosLosDetails = document.querySelectorAll('details.container');
+    todosLosDetails.forEach(details => {
+        details.addEventListener('toggle', (e) => {
+            if (details.open) {
+                todosLosDetails.forEach(otro => {
+                    if (otro !== details) {
+                        otro.removeAttribute('open');
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>
