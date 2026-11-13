@@ -174,9 +174,8 @@ input:disabled, select:disabled {
 
 .filtros-periodo {
     display: flex;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .filtros-periodo select {
@@ -197,6 +196,7 @@ input:disabled, select:disabled {
     font-size: 12.5px;
     transition: background 0.2s, transform 0.1s;
     box-shadow: 0 1px 3px rgba(16, 124, 65, 0.15);
+    align-self: flex-end;
 }
 
 .btn-excel:hover {
@@ -551,7 +551,10 @@ details.container[open] summary {
             <div id="p1-contenido-martes" class="tab-content active">
                 <div class="barra-superior-pestana">
                     <div class="filtros-periodo">
-                        <label for="filtroPctP1_martes" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <label for="filtroPctP1_martes" style="margin: 0; font-size: 14px; font-weight: 600; color: #444;">
+                            Filtrar por Asistencia:
+                            <span class="label-ayuda">Usa % total si está desde el inicio o % parcial si entró más tarde</span>
+                        </label>
                         <select id="filtroPctP1_martes" onchange="actualizarFiltroPct(1)">
                             <option value="todos">Todos</option>
                             <option value="verde">🟢 Verde (≥ 40%)</option>
@@ -579,7 +582,10 @@ details.container[open] summary {
             <div id="p1-contenido-jueves" class="tab-content">
                 <div class="barra-superior-pestana">
                     <div class="filtros-periodo">
-                        <label for="filtroPctP1_jueves" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <label for="filtroPctP1_jueves" style="margin: 0; font-size: 14px; font-weight: 600; color: #444;">
+                            Filtrar por Asistencia:
+                            <span class="label-ayuda">Usa % total si está desde el inicio o % parcial si entró más tarde</span>
+                        </label>
                         <select id="filtroPctP1_jueves" onchange="actualizarFiltroPct(1)">
                             <option value="todos">Todos</option>
                             <option value="verde">🟢 Verde (≥ 40%)</option>
@@ -617,7 +623,10 @@ details.container[open] summary {
             <div id="p2-contenido-martes" class="tab-content active">
                 <div class="barra-superior-pestana">
                     <div class="filtros-periodo">
-                        <label for="filtroPctP2_martes" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <label for="filtroPctP2_martes" style="margin: 0; font-size: 14px; font-weight: 600; color: #444;">
+                            Filtrar por Asistencia:
+                            <span class="label-ayuda">Usa % total si está desde el inicio o % parcial si entró más tarde</span>
+                        </label>
                         <select id="filtroPctP2_martes" onchange="actualizarFiltroPct(2)">
                             <option value="todos">Todos</option>
                             <option value="verde">🟢 Verde (≥ 40%)</option>
@@ -645,7 +654,10 @@ details.container[open] summary {
             <div id="p2-contenido-jueves" class="tab-content">
                 <div class="barra-superior-pestana">
                     <div class="filtros-periodo">
-                        <label for="filtroPctP2_jueves" style="margin: 0; font-size: 13px; flex-direction: row;">Filtrar por Asistencia:</label>
+                        <label for="filtroPctP2_jueves" style="margin: 0; font-size: 14px; font-weight: 600; color: #444;">
+                            Filtrar por Asistencia:
+                            <span class="label-ayuda">Usa % total si está desde el inicio o % parcial si entró más tarde</span>
+                        </label>
                         <select id="filtroPctP2_jueves" onchange="actualizarFiltroPct(2)">
                             <option value="todos">Todos</option>
                             <option value="verde">🟢 Verde (≥ 40%)</option>
@@ -1018,6 +1030,8 @@ function pintarTabla(datos){
 function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNombre, idHeaders, idCuerpo, idFoot) {
     const fechas = generarFechasPeriodo(inicioStr, finStr, diaTarget, periodoNum);
     const totalFechas = fechas.length;
+    const primeraFechaPeriodo = fechas.length > 0 ? parsearFecha(fechas[0]) : null;
+
     const key = `p${periodoNum}${grupoNombre.charAt(0).toUpperCase() + grupoNombre.slice(1)}`;
     const ordenConfig = estadosOrden[key];
 
@@ -1086,25 +1100,30 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
         const pctTotal = diasValidosTotal > 0 ? (asistenciasTotal / diasValidosTotal) * 100 : 0;
         const pctParcial = diasValidosParcial > 0 ? (asistenciasParcial / diasValidosParcial) * 100 : 0;
 
+        // Determinar inteligentemente si usa % Total o % Parcial para el filtro según su fecha de alta
+        let estaDesdeElInicio = !fechaAlta || (primeraFechaPeriodo && fechaAlta <= primeraFechaPeriodo);
+        let pctRelevanteFiltro = estaDesdeElInicio ? pctTotal : pctParcial;
+
         filasDatos.push({
             socio: socio,
             celdasFechas: celdasFechasHtml,
             pctTotal: pctTotal,
-            pctParcial: pctParcial
+            pctParcial: pctParcial,
+            pctRelevanteFiltro: pctRelevanteFiltro
         });
     });
 
     const selectFiltro = document.getElementById(`filtroPctP${periodoNum}_${grupoNombre}`);
     const filtroPctVal = selectFiltro ? selectFiltro.value : 'todos';
     
+    // FILTRADO INTELIGENTE (Total para antiguos / Parcial para incorporaciones tardías)
     if (filtroPctVal !== 'todos') {
         filasDatos = filasDatos.filter(item => {
-            const esVerdeTotal = item.pctTotal >= 40;
-            const esVerdeParcial = item.pctParcial >= 40;
+            const esVerde = item.pctRelevanteFiltro >= 40;
             if (filtroPctVal === 'verde') {
-                return esVerdeTotal || esVerdeParcial;
+                return esVerde;
             } else {
-                return !esVerdeTotal || !esVerdeParcial;
+                return !esVerde;
             }
         });
     }
@@ -1450,7 +1469,6 @@ window.aplicarFiltro = function(){
         return cumpleNombre && cumpleDia && cumpleFecha;
     });
 
-    // ORDEN LÓGICO: Más recientes primero (Fecha desc, luego Hora desc, luego Nombre asc)
     filtrados.sort((a, b) => {
         let fechaA = parsearFecha(a.fecha || "01/01/2000");
         let fechaB = parsearFecha(b.fecha || "01/01/2000");
@@ -1516,7 +1534,7 @@ window.cargarDatos = async function(){
         });
 
         sociosMartesOficiales.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
-        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+        sociosJuevesOficiales.sort((a, b) => b.nombre.localeCompare(a.nombre, 'es', { sensitivity: 'base' }));
 
         aplicarFiltro();
         pintarTablasPeriodos();
