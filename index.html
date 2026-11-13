@@ -1106,7 +1106,9 @@ function llenarMatrizPeriodo(periodoNum, inicioStr, finStr, diaTarget, grupoNomb
 
         sociosActivosCount++;
 
-        const pctTotal = diasValidosTotal > 0 ? (asistenciasTotal / diasValidosTotal) * 100 : 0;
+        const pctTotal = totalFechas > 0
+		? (asistenciasTotal / totalFechas) * 100
+		: 0;
         const pctParcial = diasValidosParcial > 0 ? (asistenciasParcial / diasValidosParcial) * 100 : 0;
 
         let estaDesdeElInicio = !fechaAlta || (primeraFechaPeriodo && fechaAlta <= primeraFechaPeriodo);
