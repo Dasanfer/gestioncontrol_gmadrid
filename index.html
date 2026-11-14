@@ -290,7 +290,7 @@ details.container:nth-of-type(4) { animation-delay: 0.5s; }
 }
 
 /* ==========================================
-   INPUTS Y SELECTS CON BORDE ANIMADO ARCOÍRIS AL FOCO
+   INPUTS Y SELECTS CON BORDE GRIS POR DEFECTO Y ANIMADO ARCOÍRIS AL FOCO
    ========================================== */
 @keyframes brilloInputArcoiris {
     0% { filter: hue-rotate(0deg); }
@@ -303,19 +303,19 @@ select {
     width: 100%;
     padding: 11px 13px;
     box-sizing: border-box;
-    border: 2px solid #d8b4fe;
+    border: 2px solid #cbd5e1;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     color: var(--text-main);
     background-color: #ffffff;
-    box-shadow: 0 2px 6px rgba(117, 0, 135, 0.03);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 input[type="text"]:hover,
 select:hover {
-    border-color: #c084fc;
+    border-color: #94a3b8;
 }
 
 input[type="text"]:focus,
@@ -330,7 +330,7 @@ select:focus {
 }
 
 input:disabled, select:disabled {
-    background-color: #faf5ff;
+    background-color: #f8fafc;
     color: #9ca3af;
     cursor: not-allowed;
 }
@@ -451,6 +451,198 @@ input:disabled, select:disabled {
         grid-template-columns: 1fr;
         gap: 12px;
     }
+}
+
+/* ==========================================
+   ESTILOS DE MENÚ DESPLEGABLE (DROPDOWN DE 3 PUNTOS)
+   ========================================== */
+.acciones-dropdown {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-puntos {
+    background: #faf5ff;
+    border: 1px solid #d8b4fe;
+    color: #750087;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-puntos:hover {
+    background: #750087;
+    color: #ffffff;
+    border-color: #750087;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    margin-bottom: 4px;
+    background: #ffffff;
+    min-width: 130px;
+    box-shadow: 0 10px 25px rgba(117, 0, 135, 0.15);
+    border: 1px solid #e9d5ff;
+    border-radius: 10px;
+    z-index: 99;
+    overflow: hidden;
+    text-align: left;
+}
+
+.dropdown-menu.mostrar {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background: #faf5ff;
+    color: #750087;
+}
+
+.dropdown-item.eliminar {
+    color: #dc2626;
+}
+
+.dropdown-item.eliminar:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ==========================================
+   ESTILOS DE MODAL DE EDICIÓN CORREGIDOS (LABEL GRIS Y ESPACIADO)
+   ========================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e2e8f0;
+    animation: entrarCentroSuave 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f172a;
+}
+
+.btn-cerrar-modal {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-cerrar-modal:hover {
+    color: #dc2626;
+}
+
+/* Contenedor del formulario del modal con mayor separación corporativa */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Aseguramos que los labels del modal sean de color gris (#475569) */
+.modal-content label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 13.5px;
+    margin-bottom: 6px;
+    color: #475569;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-footer button {
+    flex: 1;
+    margin-top: 0;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    border: none;
+}
+
+.btn-modal-guardar {
+    background: linear-gradient(135deg, #e40303, #ff8c00, #ffed00, #008026, #0044d4, #750087);
+    background-size: 300% 300%;
+    animation: bgArcoirisBtn 8s ease infinite;
+    color: white;
+}
+
+.btn-modal-cancelar {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.btn-modal-cancelar:hover {
+    background: #e2e8f0;
 }
 
 /* ==========================================
@@ -771,14 +963,13 @@ details.container[open] summary {
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    color: #64748b; /* Texto fijo sin cambios de color por hover */
+    color: #64748b;
     text-align: center;
     box-sizing: border-box;
     overflow: hidden;
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-/* EFECTO HOVER: Barrido de reflejo glass de izquierda a derecha */
 .tab-btn:not(.active):hover {
     background: #f3e8ff;
     border-color: #c084fc;
@@ -796,7 +987,6 @@ details.container[open] summary {
     pointer-events: none;
 }
 
-/* ESTADO ACTIVO: Degradado de arcoíris claro, vivo, fluido y en constante movimiento sutil con bordes más gruesos */
 .tab-btn.active {
     background: linear-gradient(135deg, rgba(228, 3, 3, 0.12), rgba(255, 140, 0, 0.12), rgba(255, 237, 0, 0.12), rgba(0, 128, 38, 0.12), rgba(0, 68, 212, 0.12), rgba(117, 0, 135, 0.12)), linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(250, 245, 255, 0.85)) !important;
     background-size: 300% 300%;
@@ -820,7 +1010,6 @@ details.container[open] summary {
     display: block;
 }
 
-/* SECCIONES INTERNAS DEL PANEL DE GESTIÓN DE SOCIOS */
 .seccion-gestion-bloque {
     background: rgba(241,241, 241, 0.8);
     backdrop-filter: blur(6px);
@@ -848,7 +1037,6 @@ details.container[open] summary {
     padding-bottom: 10px;
 }
 
-/* ESTILOS DE PAGINACIÓN */
 .paginacion-container {
     display: flex;
     justify-content: space-between;
@@ -888,7 +1076,6 @@ details.container[open] summary {
     font-weight: 500;
 }
 
-/* FOOTER INFORMATIVO CON EFECTO GLASS */
 .footer-informativo {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.75), rgba(250, 245, 255, 0.5));
     backdrop-filter: blur(8px);
@@ -922,6 +1109,35 @@ details.container[open] summary {
 <!-- Contenedor para los emotes de juegos lanzados al fondo -->
 <div id="floating-games-container"></div>
 <div class="esquina-opuesta-bg"></div>
+
+<!-- MODAL DE EDICIÓN DE FICHAJE -->
+<div id="modalEditarFichaje" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Editar Fichaje</h3>
+            <button type="button" class="btn-cerrar-modal" onclick="cerrarModalEditar()">&times;</button>
+        </div>
+        <form id="formEditarFichaje" onsubmit="confirmarGuardarEdicion(event)">
+            <input type="hidden" id="editFichajeId">
+            <div>
+                <label>Socio:</label>
+                <input type="text" id="editFichajeSocio" disabled style="background-color: #f8fafc;">
+            </div>
+            <div>
+                <label for="editFichajeFecha">Nueva Fecha:</label>
+                <input type="text" id="editFichajeFecha" required placeholder="DD/MM/AAAA">
+            </div>
+            <div>
+                <label for="editFichajeHora">Nueva Hora:</label>
+                <input type="text" id="editFichajeHora" required placeholder="HH:MM">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancelar" onclick="cerrarModalEditar()">Cancelar</button>
+                <button type="submit" class="btn-modal-guardar">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="wrapper-principal">
 
@@ -1137,7 +1353,7 @@ details.container[open] summary {
                             <th>Hora</th>
                             <th>Grupo</th>
                             <th style="text-align: center;">Forma de Registro</th>
-                            <th style="text-align: center;">Eliminar</th>
+                            <th style="text-align: center;">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="tablaDatos"></tbody>
@@ -1269,7 +1485,7 @@ details.container[open] summary {
                             Sube tu archivo CSV con las columnas: <b>nombre, fecha (DD/MM/AAAA), grupo (martes/jueves)</b>.<br>
                             <i>Una vez que termines de importar y verifiques tus datos, borra este bloque y su función JS asociada.</i>
                         </p>
-                        <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 12px; font-size: 13px; background: white; padding: 8px; border: 1px solid #dcdcdc; border-radius: 8px; width: 100%;">
+                        <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 12px; font-size: 13px; background: white; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%;">
                         <button type="button" class="btn-accion" style="padding: 10px 20px; font-size: 13px; margin-top: 0;" onclick="importarCSVAFirebase()">Subir Fichajes Masivamente a Firebase</button>
                     </div>
                 </div>
@@ -1336,6 +1552,15 @@ window.addEventListener('DOMContentLoaded', () => {
     if (elemFecha) {
         elemFecha.innerHTML = `📅 Hoy es ${hoyStr.charAt(0).toUpperCase() + hoyStr.slice(1)} — Panel activo de GMadrid Juegos de Mesa`;
     }
+
+    // Cerrar menús desplegables al hacer clic fuera
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.acciones-dropdown')) {
+            document.querySelectorAll('.dropdown-menu.mostrar').forEach(menu => {
+                menu.classList.remove('mostrar');
+            });
+        }
+    });
 });
 </script>
 
@@ -1347,6 +1572,7 @@ import {
     getDocs,
     doc,
     setDoc,
+    updateDoc,
     deleteDoc
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
@@ -1540,7 +1766,16 @@ function pintarTablaHistorialPaginada() {
             ? `<span class="badge-forma-manual">Manual</span>` 
             : `<span class="badge-forma-fichaje">Fichaje</span>`;
 
-        const btnEliminarHtml = `<button type="button" onclick="eliminarFichaje('${dato.id}')" title="Eliminar fichaje" style="background-color: #dc2626; color: #ffffff; border: 1px solid #b91c1c; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: bold; line-height: 1; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#b91c1c'" onmouseout="this.style.backgroundColor='#dc2626'">×</button>`;
+        // Menú desplegable compacto de 3 puntos
+        const accionesHtml = `
+            <div class="acciones-dropdown">
+                <button type="button" class="btn-puntos" onclick="toggleDropdown(event, '${dato.id}')">⋮</button>
+                <div id="dropdown-${dato.id}" class="dropdown-menu">
+                    <button type="button" class="dropdown-item" onclick="abrirModalEditar('${dato.id}', '${nombreLimpio.replace(/'/g, "\\'")}', '${dato.fecha}', '${dato.hora}')">✏️ Editar</button>
+                    <button type="button" class="dropdown-item eliminar" onclick="eliminarFichaje('${dato.id}', '${nombreLimpio.replace(/'/g, "\\'")}', '${dato.fecha}')">🗑️ Eliminar</button>
+                </div>
+            </div>
+        `;
 
         tabla.innerHTML += `
         <tr>
@@ -1549,7 +1784,7 @@ function pintarTablaHistorialPaginada() {
             <td>${dato.hora || ""}</td>
             <td>${grupoBonito}</td>
             <td style="text-align: center;">${badgeFormaHtml}</td>
-            <td style="text-align: center;">${btnEliminarHtml}</td>
+            <td style="text-align: center;">${accionesHtml}</td>
         </tr>`;
     });
 
@@ -1568,14 +1803,66 @@ window.cambiarPaginaHistorial = function(direccion) {
     pintarTablaHistorialPaginada();
 };
 
-window.eliminarFichaje = async function(idFichaje) {
-    if (confirm("¿Estás seguro de que deseas eliminar este registro de fichaje? Esta acción actualizará automáticamente las tablas de control de asistencia.")) {
+window.toggleDropdown = function(event, id) {
+    event.stopPropagation();
+    const dropdownActual = document.getElementById(`dropdown-${id}`);
+    
+    // Cerrar otros menús abiertos
+    document.querySelectorAll('.dropdown-menu.mostrar').forEach(menu => {
+        if (menu !== dropdownActual) menu.classList.remove('mostrar');
+    });
+
+    dropdownActual.classList.toggle('mostrar');
+};
+
+window.eliminarFichaje = async function(idFichaje, nombreSocio, fechaFichaje) {
+    if (confirm(`⚠️ ¿Estás seguro de eliminar el registro de fichaje de "${nombreSocio}" del día ${fechaFichaje}?\n\nEsta acción actualizará automáticamente las tablas de control.`)) {
         try {
             await deleteDoc(doc(db, "fichajes", idFichaje));
             await cargarDatos();
         } catch (error) {
             console.error("Error al eliminar el fichaje:", error);
             alert("No se pudo eliminar el fichaje de la base de datos.");
+        }
+    }
+};
+
+// GESTIÓN DE MODAL DE EDICIÓN
+window.abrirModalEditar = function(id, nombre, fecha, hora) {
+    document.getElementById('editFichajeId').value = id;
+    document.getElementById('editFichajeSocio').value = nombre;
+    document.getElementById('editFichajeFecha').value = fecha;
+    document.getElementById('editFichajeHora').value = hora;
+    
+    document.getElementById('modalEditarFichaje').style.display = 'flex';
+    
+    // Cerrar menú desplegable
+    document.querySelectorAll('.dropdown-menu.mostrar').forEach(m => m.classList.remove('mostrar'));
+};
+
+window.cerrarModalEditar = function() {
+    document.getElementById('modalEditarFichaje').style.display = 'none';
+};
+
+window.confirmarGuardarEdicion = async function(event) {
+    event.preventDefault();
+    const id = document.getElementById('editFichajeId').value;
+    const socio = document.getElementById('editFichajeSocio').value;
+    const nuevaFecha = document.getElementById('editFichajeFecha').value.trim();
+    const nuevaHora = document.getElementById('editFichajeHora').value.trim();
+
+    if (confirm(`⚠️ ¿Deseas guardar los cambios para el fichaje de "${socio}"?\n\n• Nueva Fecha: ${nuevaFecha}\n• Nueva Hora: ${nuevaHora}`)) {
+        try {
+            await updateDoc(doc(db, "fichajes", id), {
+                fecha: nuevaFecha,
+                hora: nuevaHora
+            });
+            cerrarModalEditar();
+            await cargarDatos();
+            alert("✅ Fichaje actualizado con éxito.");
+        } catch (error) {
+            console.error("Error al actualizar el fichaje:", error);
+            alert("Hubo un error al actualizar el fichaje en Firebase.");
         }
     }
 };
@@ -2257,4 +2544,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 </body>
-</html>
+</html>
