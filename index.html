@@ -21,7 +21,7 @@ href='data:image/svg+xml,
 <circle cx="42" cy="42" r="3.5" fill="black"/>
 </svg>'>
 
-<title>Panel de Gestión y Control de Asistencias - GMadrid Juegos de Mesa</title>
+<title>Panel de Gestión, Administración y Control de Asistencias - GMadrid Juegos de Mesa</title>
 
 <!-- Importar SheetJS para exportar a Excel corporativo con formato nativo .xlsx -->
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
@@ -454,7 +454,7 @@ input:disabled, select:disabled {
 }
 
 /* ==========================================
-   ESTILOS DE MENÚ DESPLEGABLE (DROPDOWN DE 3 PUNTOS)
+   ESTILOS DE MENÚ DESPLEGABLE (DROPDOWN DE 3 PUNTOS) - POSICIONADO A LA IZQUIERDA
    ========================================== */
 .acciones-dropdown {
     position: relative;
@@ -487,11 +487,11 @@ input:disabled, select:disabled {
 .dropdown-menu {
     display: none;
     position: absolute;
-    right: 0;
-    bottom: 100%;
-    margin-bottom: 4px;
+    right: 100%;
+    top: 0;
+    margin-right: 6px;
     background: #ffffff;
-    min-width: 130px;
+    min-width: 140px;
     box-shadow: 0 10px 25px rgba(117, 0, 135, 0.15);
     border: 1px solid #e9d5ff;
     border-radius: 10px;
@@ -1144,8 +1144,8 @@ details.container[open] summary {
     <header>
         <div class="header-principal">
             <div class="hub-avatar">📊</div>
-            <h1>Panel de Gestión y Control de Asistencias</h1>
-            <h2>GMadrid Juegos de Mesa 🏳️‍🌈🎲</h2>
+            <h1>Panel de Gestión, Administración y Control de Asistencias</h1>
+            <h2>GMadrid Juegos de Mesa 🏳️‍🌈</h2>
         </div>
     </header>
 
@@ -1766,7 +1766,7 @@ function pintarTablaHistorialPaginada() {
             ? `<span class="badge-forma-manual">Manual</span>` 
             : `<span class="badge-forma-fichaje">Fichaje</span>`;
 
-        // Menú desplegable compacto de 3 puntos
+        // Menú desplegable compacto de 3 puntos (posicionado a la izquierda del botón)
         const accionesHtml = `
             <div class="acciones-dropdown">
                 <button type="button" class="btn-puntos" onclick="toggleDropdown(event, '${dato.id}')">⋮</button>
